@@ -33,19 +33,23 @@ public class ZKPoolStore {
 
     public ZKPoolStore(Watcher watcher) throws IOException {
         initParams();
-        if(watcher != null){
+        if (watcher != null) {
             createPool(watcher);
-        }else{
+        } else {
             createPool();
         }
     }
     // 用于封装服务
     /*private static  ZooKeeper instance;
     
-    public synchronized  ZooKeeper getInstance() throws IOException{
+    public synchronized  ZooKeeper getInstance(Watcher watcher) throws IOException{
         if(instance == null)
         {
-            instance = new createPool();
+            if(watcher != null){
+            createPool(watcher);
+        }else{
+            createPool();
+        }
         }
         return instance;
     }*/
@@ -68,13 +72,14 @@ public class ZKPoolStore {
      * @throws IOException 
      **/
     public void createPool() throws IOException {
-        zk =  new ZooKeeper(ZK_SERVER_HOST + ":" + ZK_CLIENT_PORT, ZK_CONNECTION_TIMEOUT,
+        zk = new ZooKeeper(ZK_SERVER_HOST + ":" + ZK_CLIENT_PORT, ZK_CONNECTION_TIMEOUT,
                 new Watcher() {
                     public void process(WatchedEvent event) {
                         System.out.println("已经触发了" + event.getType() + "事件！");
                     }
                 });
     }
+
     /** 
      * Description： 创建自定义Watcher链接
      * @param watcher
@@ -83,9 +88,9 @@ public class ZKPoolStore {
      * @author liujie@lljqiu.com
      **/
     public void createPool(Watcher watcher) throws IOException {
-        zk = new ZooKeeper(ZK_SERVER_HOST + ":" + ZK_CLIENT_PORT,ZK_CONNECTION_TIMEOUT,watcher);
+        zk = new ZooKeeper(ZK_SERVER_HOST + ":" + ZK_CLIENT_PORT, ZK_CONNECTION_TIMEOUT, watcher);
     }
-    
+
     /** 
      * Description：关闭当前链接
      * @throws InterruptedException
@@ -118,9 +123,11 @@ public class ZKPoolStore {
     * @return void
     * @author liujie@lljqiu.com
      **/
-    public List<String> getNodeList(String nodePath, boolean watch) throws KeeperException, InterruptedException {
+    public List<String> getNodeList(String nodePath, boolean watch)
+            throws KeeperException, InterruptedException {
         return zk.getChildren(nodePath, watch);
     }
+
     /** 
      * Description：
      * <p>Return the list of the children of the node of the given path.</p>
@@ -135,7 +142,8 @@ public class ZKPoolStore {
      * @return List<String>
      * @author liujie@lljqiu.com
      **/
-    public List<String> getNodeList(String nodePath, Watcher watch) throws KeeperException, InterruptedException {
+    public List<String> getNodeList(String nodePath, Watcher watch)
+            throws KeeperException, InterruptedException {
         return zk.getChildren(nodePath, watch);
     }
 
@@ -167,18 +175,20 @@ public class ZKPoolStore {
     public Stat getNodeStatus(String nodePath) throws KeeperException, InterruptedException {
         return zk.exists(nodePath, true);
     }
-     /** 
-     * Description： 获取当前结点状态
-     * @param nodePath 节点路径
-     * @param watcher 当前节点
-     * @throws KeeperException
-     * @throws InterruptedException
-     * @return Stat
-     * @author liujie@lljqiu.com
-     **/
-    public Stat getNodeStatus(String nodePath, Watcher watcher) throws KeeperException, InterruptedException {
-         return zk.exists(nodePath, watcher);
-     }
+
+    /** 
+    * Description： 获取当前结点状态
+    * @param nodePath 节点路径
+    * @param watcher 当前节点
+    * @throws KeeperException
+    * @throws InterruptedException
+    * @return Stat
+    * @author liujie@lljqiu.com
+    **/
+    public Stat getNodeStatus(String nodePath, Watcher watcher)
+            throws KeeperException, InterruptedException {
+        return zk.exists(nodePath, watcher);
+    }
 
     /** 
     * Description： 向节点添加数据
@@ -210,11 +220,15 @@ public class ZKPoolStore {
         //        zk.setData(nodePath, data, version);
         return zk.getData(nodePath, true, getNodeStatus(nodePath));
     }
-    public byte[] getData(String nodePath, boolean watcher) throws KeeperException, InterruptedException {
+
+    public byte[] getData(String nodePath, boolean watcher)
+            throws KeeperException, InterruptedException {
         //        zk.setData(nodePath, data, version);
         return zk.getData(nodePath, watcher, getNodeStatus(nodePath));
     }
-    public byte[] getData(String nodePath, Watcher watcher) throws KeeperException, InterruptedException {
+
+    public byte[] getData(String nodePath, Watcher watcher)
+            throws KeeperException, InterruptedException {
         //        zk.setData(nodePath, data, version);
         return zk.getData(nodePath, watcher, null);
     }
