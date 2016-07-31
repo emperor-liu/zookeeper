@@ -31,9 +31,13 @@ public class ZookeeperPoolStore {
     private static int    ZK_CONNECTION_TIMEOUT;
     private ZooKeeper     zk;
 
-    public ZookeeperPoolStore() throws IOException {
+    public ZookeeperPoolStore(Watcher watcher) throws IOException {
         initParams();
-        zk = createPool();
+        if(watcher != null){
+            createPool(watcher);
+        }else{
+            createPool();
+        }
     }
     // 用于封装服务
     /*private static  CreatePool instance;
@@ -63,13 +67,23 @@ public class ZookeeperPoolStore {
     * @author liujie@lljqiu.com
      * @throws IOException 
      **/
-    public ZooKeeper createPool() throws IOException {
-        return new ZooKeeper(ZK_SERVER_HOST + ":" + ZK_CLIENT_PORT, ZK_CONNECTION_TIMEOUT,
+    public void createPool() throws IOException {
+        zk =  new ZooKeeper(ZK_SERVER_HOST + ":" + ZK_CLIENT_PORT, ZK_CONNECTION_TIMEOUT,
                 new Watcher() {
                     public void process(WatchedEvent event) {
                         System.out.println("已经触发了" + event.getType() + "事件！");
                     }
                 });
+    }
+    /** 
+     * Description： 创建自定义Watcher链接
+     * @param watcher
+     * @throws IOException
+     * @return ZooKeeper
+     * @author liujie@lljqiu.com
+     **/
+    public void createPool(Watcher watcher) throws IOException {
+        zk = new ZooKeeper(ZK_SERVER_HOST + ":" + ZK_CLIENT_PORT,ZK_CONNECTION_TIMEOUT,watcher);
     }
 
     /** 
@@ -156,5 +170,13 @@ public class ZookeeperPoolStore {
     public byte[] getData(String nodePath) throws KeeperException, InterruptedException {
         //        zk.setData(nodePath, data, version);
         return zk.getData(nodePath, true, getNodeStatus(nodePath));
+    }
+    public byte[] getData(String nodePath, boolean watcher) throws KeeperException, InterruptedException {
+        //        zk.setData(nodePath, data, version);
+        return zk.getData(nodePath, watcher, getNodeStatus(nodePath));
+    }
+    public byte[] getData(String nodePath, Watcher watcher) throws KeeperException, InterruptedException {
+        //        zk.setData(nodePath, data, version);
+        return zk.getData(nodePath, watcher, null);
     }
 }

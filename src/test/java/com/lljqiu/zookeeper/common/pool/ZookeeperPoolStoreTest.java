@@ -22,8 +22,8 @@ public class ZookeeperPoolStoreTest {
 
     public static void main(String[] args)
             throws IOException, KeeperException, InterruptedException {
-        ZookeeperPoolStore pool = new ZookeeperPoolStore();
-        pool.createNode("/liujie", "test");
+        ZookeeperPoolStore pool = new ZookeeperPoolStore(null);
+        pool.createNode("/watherNode", "test");
         System.out.println("当前节点状态："+pool.getNodeStatus("/liujie"));
         System.out.println("当前节点信息："+pool.getNodeList("/liujie"));
         pool.setData("/liujie", "test".getBytes(), 0);
