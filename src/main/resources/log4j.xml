@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<log4j:configuration>
+	<appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d -%-4r [%t] %-5p %x - (%13F:%L) - %m%n" />
+		</layout>
+	</appender>
+	<appender name="ZK-DEBUG-FILE" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="/lljqiu/logs/zk/debug.log" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d -%-4r [%t] %-5p %x - (%13F:%L) - %m%n" />
+		</layout>
+	</appender>
+
+	<logger name="com.lljqiu.zookeper" additivity="false">
+		<level value="debug" />
+		<appender-ref ref="ZK-DEBUG-FILE" />
+	</logger>
+	<root>
+		<priority value="debug" />
+	</root>
+</log4j:configuration> 

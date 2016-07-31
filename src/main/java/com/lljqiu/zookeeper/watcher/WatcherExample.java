@@ -35,22 +35,22 @@ public class WatcherExample implements Watcher {
 
     public void process(WatchedEvent event) {
      // watcher名称
-        System.out.println("watcher=" + this.getClass().getName());
+        System.out.println("watcherName=" + this.getClass().getName());
         // 路径
-        System.out.println("path=" + event.getPath());
+        System.out.println("watcherPath=" + event.getPath());
         // 时间类型
         System.out.println("eventType=" + event.getType().name());
-
-        
     }
+    
     public static void main(String[] args) {
         WatcherExample wx = new WatcherExample();
+        System.out.println("Server Config:"+wx.getZkPath());
         try {
                 // 创建zk客户端
             ZooKeeper zk = new ZooKeeper(wx.getZkPath(), 10000, wx);
                 //不使用默认的watcher
-            zk.getChildren("/liujie", false);
-            Thread.sleep(1000);
+            zk.getChildren("/watcherEcample", true); //当第二个参数为false则不会监听
+            Thread.sleep(100000);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (KeeperException e) {

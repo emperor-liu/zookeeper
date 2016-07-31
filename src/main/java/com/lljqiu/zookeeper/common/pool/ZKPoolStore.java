@@ -25,13 +25,13 @@ import org.apache.zookeeper.data.Stat;
  * Auther：liujie@lljqiu.com <br>
  * Create Time: 2016年7月29日<br>
  */
-public class ZookeeperPoolStore {
+public class ZKPoolStore {
     private static String ZK_SERVER_HOST;
     private static String ZK_CLIENT_PORT;
     private static int    ZK_CONNECTION_TIMEOUT;
     private ZooKeeper     zk;
 
-    public ZookeeperPoolStore(Watcher watcher) throws IOException {
+    public ZKPoolStore(Watcher watcher) throws IOException {
         initParams();
         if(watcher != null){
             createPool(watcher);
@@ -40,12 +40,12 @@ public class ZookeeperPoolStore {
         }
     }
     // 用于封装服务
-    /*private static  CreatePool instance;
+    /*private static  ZooKeeper instance;
     
-    public synchronized  CreatePool getInstance() throws IOException{
+    public synchronized  ZooKeeper getInstance() throws IOException{
         if(instance == null)
         {
-            instance = new CreatePool();
+            instance = new createPool();
         }
         return instance;
     }*/
@@ -85,6 +85,16 @@ public class ZookeeperPoolStore {
     public void createPool(Watcher watcher) throws IOException {
         zk = new ZooKeeper(ZK_SERVER_HOST + ":" + ZK_CLIENT_PORT,ZK_CONNECTION_TIMEOUT,watcher);
     }
+    
+    /** 
+     * Description：关闭当前链接
+     * @throws InterruptedException
+     * @return void
+     * @author liujie@lljqiu.com
+     **/
+    public void closePool() throws InterruptedException {
+        zk.close();
+    }
 
     /** 
     * Description： 创建目录节点
@@ -108,8 +118,25 @@ public class ZookeeperPoolStore {
     * @return void
     * @author liujie@lljqiu.com
      **/
-    public List<String> getNodeList(String nodePath) throws KeeperException, InterruptedException {
-        return zk.getChildren(nodePath, true);
+    public List<String> getNodeList(String nodePath, boolean watch) throws KeeperException, InterruptedException {
+        return zk.getChildren(nodePath, watch);
+    }
+    /** 
+     * Description：
+     * <p>Return the list of the children of the node of the given path.</p>
+     * <p>If the watch is non-null and the call is successful (no exception is thrown), a watch will be left on the node with the given path.
+     * The watch willbe triggered by a successful operation that deletes the node of the given path or creates/delete a child under the node.</p>
+     * <p>The list of children returned is not sorted and no guarantee is provided as to its natural or lexical order.</p>
+     * <p>A KeeperException with error code KeeperException.NoNode will be thrown if no node with the given path exists.</p>
+     * @param nodePath
+     * @param watch
+     * @throws KeeperException
+     * @throws InterruptedException
+     * @return List<String>
+     * @author liujie@lljqiu.com
+     **/
+    public List<String> getNodeList(String nodePath, Watcher watch) throws KeeperException, InterruptedException {
+        return zk.getChildren(nodePath, watch);
     }
 
     /** 
@@ -140,6 +167,18 @@ public class ZookeeperPoolStore {
     public Stat getNodeStatus(String nodePath) throws KeeperException, InterruptedException {
         return zk.exists(nodePath, true);
     }
+     /** 
+     * Description： 获取当前结点状态
+     * @param nodePath 节点路径
+     * @param watcher 当前节点
+     * @throws KeeperException
+     * @throws InterruptedException
+     * @return Stat
+     * @author liujie@lljqiu.com
+     **/
+    public Stat getNodeStatus(String nodePath, Watcher watcher) throws KeeperException, InterruptedException {
+         return zk.exists(nodePath, watcher);
+     }
 
     /** 
     * Description： 向节点添加数据
